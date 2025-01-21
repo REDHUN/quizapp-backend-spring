@@ -46,7 +46,7 @@ public class QuestionRequest {
         this.difficultyId = difficultyId;
     }
 
-    public int getQuestionType() {
+    public long getQuestionType() {
         return questionType;
     }
 

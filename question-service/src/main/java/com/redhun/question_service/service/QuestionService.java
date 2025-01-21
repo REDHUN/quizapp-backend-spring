@@ -3,21 +3,18 @@ package com.redhun.question_service.service;
 import com.redhun.question_service.dto.OptionResponse;
 import com.redhun.question_service.dto.QuestionRequest;
 import com.redhun.question_service.dto.QuestionResponse;
-import com.redhun.question_service.models.Category;
-import com.redhun.question_service.models.Difficulty;
-import com.redhun.question_service.models.Option;
-import com.redhun.question_service.models.Question;
+import com.redhun.question_service.models.*;
 import com.redhun.question_service.repository.CategoryRepository;
 import com.redhun.question_service.repository.DifficultyRepository;
 import com.redhun.question_service.repository.QuestionRepository;
+import com.redhun.question_service.repository.QuestionTypeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
-
-
 
 @Service
 public class QuestionService {
@@ -30,6 +27,8 @@ public class QuestionService {
 
     @Autowired
     private DifficultyRepository difficultyRepository;
+    @Autowired
+    private QuestionTypeRepository questionTypeRepository;
 
     @Transactional
     public QuestionResponse createQuestion(QuestionRequest questionRequest) {
@@ -37,13 +36,17 @@ public class QuestionService {
                 .orElseThrow(() -> new RuntimeException("Category not found"));
         Difficulty difficulty = difficultyRepository.findById(questionRequest.getDifficultyId())
                 .orElseThrow(() -> new RuntimeException("Difficulty not found"));
+       QuestionType questionType = questionTypeRepository.findById(questionRequest.getQuestionType())
+                .orElseThrow(() -> new RuntimeException("Difficulty not found"));
 
         Question question = new Question();
         question.setQuestion(questionRequest.getQuestion());
-        question.setCorrectAnswer(questionRequest.getCorrectAnswer());  // This will be used to find the correct answer ID
-        question.setQuestionType(questionRequest.getQuestionType());
+        question.setCorrectAnswer(questionRequest.getCorrectAnswer());
+        question.setQuestionType(questionType);
         question.setCategory(category);
         question.setDifficulty(difficulty);
+        question.setCreatedBy("defaultUser");  // Replace with actual user
+        question.setCreatedTime(LocalDateTime.now());
 
         List<Option> options = questionRequest.getOptions().stream()
                 .map(optionRequest -> new Option(optionRequest.getText(), question))
@@ -52,7 +55,6 @@ public class QuestionService {
         question.setOptions(options);
         Question savedQuestion = questionRepository.save(question);
 
-        // Find the correct answer ID
         Long correctAnswerId = options.stream()
                 .filter(option -> option.getOptionText().equals(questionRequest.getCorrectAnswer()))
                 .findFirst()
@@ -67,10 +69,13 @@ public class QuestionService {
         response.setId(savedQuestion.getId());
         response.setQuestion(savedQuestion.getQuestion());
         response.setCorrectAnswerId(correctAnswerId);
-        response.setQuestionType(savedQuestion.getQuestionType());
-        response.setCategoryName(savedQuestion.getCategory().toString());
-        response.setDifficultyName(savedQuestion.getDifficulty().toString());
+        response.setQuestionTypeId(savedQuestion.getQuestionType().getId());
+        response.setQuestionTypeName(savedQuestion.getQuestionType().getName());
+        response.setCategoryName(savedQuestion.getCategory().getName());
+        response.setDificaltyName(savedQuestion.getDifficulty().getName());
         response.setOptions(optionResponses);
+        response.setCreatedBy(savedQuestion.getCreatedBy());
+        response.setCreatedTime(savedQuestion.getCreatedTime());
 
         return response;
     }
@@ -84,7 +89,6 @@ public class QuestionService {
                 .map(option -> new OptionResponse(option.getId(), option.getOptionText()))
                 .collect(Collectors.toList());
 
-        // Find the correct answer ID
         Long correctAnswerId = question.getOptions().stream()
                 .filter(option -> option.getOptionText().equals(question.getCorrectAnswer()))
                 .findFirst()
@@ -95,10 +99,15 @@ public class QuestionService {
         response.setId(question.getId());
         response.setQuestion(question.getQuestion());
         response.setCorrectAnswerId(correctAnswerId);
-        response.setQuestionType(question.getQuestionType());
-        response.setCategoryName(question.getCategory().toString());
-        response.setDifficultyName(question.getDifficulty().toString());
+        response.setQuestionTypeId(question.getQuestionType().getId());
+        response.setQuestionTypeName(question.getQuestionType().getName());
+       response.setCategoryId(question.getCategory().getId());
+       response.setDifficultyId(question.getDifficulty().getId());
         response.setOptions(optionResponses);
+        response.setCategoryName(question.getCategory().getName());
+        response.setDificaltyName(question.getDifficulty().getName());
+        response.setCreatedBy(question.getCreatedBy());
+        response.setCreatedTime(question.getCreatedTime());
 
         return response;
     }

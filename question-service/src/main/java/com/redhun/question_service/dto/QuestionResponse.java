@@ -1,5 +1,6 @@
 package com.redhun.question_service.dto;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class QuestionResponse {
@@ -7,34 +8,93 @@ public class QuestionResponse {
     private String question;
     private Long correctAnswerId;
 
-    public QuestionResponse(Long id, String question, int questionType, String difficultyName, List<OptionResponse> options, String categoryName, Long correctAnswerId) {
+
+
+    public String getCategoryName() {
+        return categoryName;
+    }
+
+    public void setCategoryName(String categoryName) {
+        this.categoryName = categoryName;
+    }
+
+    public String getDificaltyName() {
+        return dificaltyName;
+    }
+
+    public void setDificaltyName(String dificaltyName) {
+        this.dificaltyName = dificaltyName;
+    }
+
+    private String categoryName;
+    private String dificaltyName;
+
+    public Long getCategoryId() {
+        return categoryId;
+    }
+
+    public void setCategoryId(Long categoryId) {
+        this.categoryId = categoryId;
+    }
+
+    public Long getDifficultyId() {
+        return difficultyId;
+    }
+
+    public void setDifficultyId(Long difficultyId) {
+        this.difficultyId = difficultyId;
+    }
+
+    private  Long questionTypeId;
+
+    public String getQuestionTypeName() {
+        return questionTypeName;
+    }
+
+    public void setQuestionTypeName(String questionTypeName) {
+        this.questionTypeName = questionTypeName;
+    }
+
+    public Long getQuestionTypeId() {
+        return questionTypeId;
+    }
+
+    public void setQuestionTypeId(Long questionTypeId) {
+        this.questionTypeId = questionTypeId;
+    }
+
+    private String questionTypeName;
+    private Long categoryId;
+    private Long difficultyId;
+    private List<OptionResponse> options;
+    private String createdBy;
+    private LocalDateTime createdTime;
+
+    public QuestionResponse(Long id, String question,  Long difficultyId, List<OptionResponse> options, Long categoryId, Long correctAnswerId, String createdBy, LocalDateTime createdTime,String categoryName,String dificaltyName,Long questionTypeId,String questionTypeName) {
         this.id = id;
         this.question = question;
-        this.questionType = questionType;
-        this.difficultyName = difficultyName;
+this.questionTypeId=questionTypeId;
+this.questionTypeName=questionTypeName;
+this.categoryName=categoryName;
+this.dificaltyName=dificaltyName;
         this.options = options;
-        this.categoryName = categoryName;
+        this.categoryId = categoryId;
+        this.difficultyId = difficultyId;
         this.correctAnswerId = correctAnswerId;
+        this.createdBy = createdBy;
+        this.createdTime = createdTime;
     }
 
     public QuestionResponse() {
-
     }
 
-    public int getQuestionType() {
-        return questionType;
+    // Getters and Setters
+    public Long getId() {
+        return id;
     }
 
-    public void setQuestionType(int questionType) {
-        this.questionType = questionType;
-    }
-
-    public Long getCorrectAnswerId() {
-        return correctAnswerId;
-    }
-
-    public void setCorrectAnswerId(Long correctAnswerId) {
-        this.correctAnswerId = correctAnswerId;
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getQuestion() {
@@ -45,21 +105,18 @@ public class QuestionResponse {
         this.question = question;
     }
 
-    public Long getId() {
-        return id;
+    public Long getCorrectAnswerId() {
+        return correctAnswerId;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setCorrectAnswerId(Long correctAnswerId) {
+        this.correctAnswerId = correctAnswerId;
     }
 
-    public String getCategoryName() {
-        return categoryName;
-    }
 
-    public void setCategoryName(String categoryName) {
-        this.categoryName = categoryName;
-    }
+
+
+
 
     public List<OptionResponse> getOptions() {
         return options;
@@ -69,21 +126,21 @@ public class QuestionResponse {
         this.options = options;
     }
 
-    public String getDifficultyName() {
-        return difficultyName;
+    public String getCreatedBy() {
+        return createdBy;
     }
 
-    public void setDifficultyName(String difficultyName) {
-        this.difficultyName = difficultyName;
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
     }
 
-    private int questionType;
-    private String categoryName;
-    private String difficultyName;
-    private List<OptionResponse> options;
+    public LocalDateTime getCreatedTime() {
+        return createdTime;
+    }
 
-    // Getters and setters
-    // ...
+    public void setCreatedTime(LocalDateTime createdTime) {
+        this.createdTime = createdTime;
+    }
+
+
 }
-
-
