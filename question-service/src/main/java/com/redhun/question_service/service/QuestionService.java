@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -36,7 +37,7 @@ public class QuestionService {
                 .orElseThrow(() -> new RuntimeException("Category not found"));
         Difficulty difficulty = difficultyRepository.findById(questionRequest.getDifficultyId())
                 .orElseThrow(() -> new RuntimeException("Difficulty not found"));
-       QuestionType questionType = questionTypeRepository.findById(questionRequest.getQuestionType())
+        QuestionType questionType = questionTypeRepository.findById(questionRequest.getQuestionType())
                 .orElseThrow(() -> new RuntimeException("Difficulty not found"));
 
         Question question = new Question();
@@ -82,33 +83,186 @@ public class QuestionService {
 
     @Transactional(readOnly = true)
     public QuestionResponse getQuestionById(Long id) {
-        Question question = questionRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Question not found"));
+        // Find question by ID, return null if not found
+        Question question = questionRepository.findById(id).orElse(null);
+        if (question == null) {
+            return null; // Return null or a custom empty response object
+        }
 
+        // Map options to OptionResponse
         List<OptionResponse> optionResponses = question.getOptions().stream()
                 .map(option -> new OptionResponse(option.getId(), option.getOptionText()))
                 .collect(Collectors.toList());
 
+        // Find correct answer ID if present
         Long correctAnswerId = question.getOptions().stream()
                 .filter(option -> option.getOptionText().equals(question.getCorrectAnswer()))
                 .findFirst()
-                .orElseThrow(() -> new RuntimeException("Correct answer not found in options"))
-                .getId();
+                .map(Option::getId) // Use map to handle Optional gracefully
+                .orElse(null); // Return null if not found
 
+        // Build the QuestionResponse object
         QuestionResponse response = new QuestionResponse();
         response.setId(question.getId());
         response.setQuestion(question.getQuestion());
         response.setCorrectAnswerId(correctAnswerId);
         response.setQuestionTypeId(question.getQuestionType().getId());
         response.setQuestionTypeName(question.getQuestionType().getName());
-       response.setCategoryId(question.getCategory().getId());
-       response.setDifficultyId(question.getDifficulty().getId());
+        response.setCategoryId(question.getCategory().getId());
+        response.setDifficultyId(question.getDifficulty().getId());
         response.setOptions(optionResponses);
         response.setCategoryName(question.getCategory().getName());
         response.setDificaltyName(question.getDifficulty().getName());
         response.setCreatedBy(question.getCreatedBy());
         response.setCreatedTime(question.getCreatedTime());
 
-        return response;
+        return response; // Return the built response
+    }
+
+
+    public List<QuestionResponse> getAllQuestion() {
+        List<Question> questionList = questionRepository.findAll();
+
+        if (questionList.isEmpty()) {
+            return new ArrayList<>(); // Return empty list
+        }
+
+        List<QuestionResponse> questionResponseList = new ArrayList<>();
+        for (Question question : questionList) {
+            List<OptionResponse> optionResponses = question.getOptions().stream()
+                    .map(option -> new OptionResponse(option.getId(), option.getOptionText()))
+                    .collect(Collectors.toList());
+
+            Long correctAnswerId = question.getOptions().stream()
+                    .filter(option -> option.getOptionText().equals(question.getCorrectAnswer()))
+                    .findFirst()
+                    .map(Option::getId) // Use map to handle optional
+                    .orElse(null);
+
+            QuestionResponse response = new QuestionResponse();
+            response.setId(question.getId());
+            response.setQuestion(question.getQuestion());
+            response.setCorrectAnswerId(correctAnswerId);
+            response.setQuestionTypeId(question.getQuestionType().getId());
+            response.setQuestionTypeName(question.getQuestionType().getName());
+            response.setCategoryId(question.getCategory().getId());
+            response.setDifficultyId(question.getDifficulty().getId());
+            response.setOptions(optionResponses);
+            response.setCategoryName(question.getCategory().getName());
+            response.setDificaltyName(question.getDifficulty().getName());
+            response.setCreatedBy(question.getCreatedBy());
+            response.setCreatedTime(question.getCreatedTime());
+            questionResponseList.add(response);
+        }
+        return questionResponseList;
+    }
+
+
+    public List<QuestionResponse> findQuestionsByCategoryId(Long categoryId) {
+        List<Question> questionList = questionRepository.findByCategoryId(categoryId);
+
+        if (questionList.isEmpty()) {
+            return new ArrayList<>(); // Return empty list
+        }
+
+        return questionList.stream().map(question -> {
+            List<OptionResponse> optionResponses = question.getOptions().stream()
+                    .map(option -> new OptionResponse(option.getId(), option.getOptionText()))
+                    .collect(Collectors.toList());
+
+            Long correctAnswerId = question.getOptions().stream()
+                    .filter(option -> option.getOptionText().equals(question.getCorrectAnswer()))
+                    .findFirst()
+                    .map(Option::getId) // Use map to handle optional
+                    .orElse(null);
+
+            QuestionResponse response = new QuestionResponse();
+            response.setId(question.getId());
+            response.setQuestion(question.getQuestion());
+            response.setCorrectAnswerId(correctAnswerId);
+            response.setQuestionTypeId(question.getQuestionType().getId());
+            response.setQuestionTypeName(question.getQuestionType().getName());
+            response.setCategoryId(question.getCategory().getId());
+            response.setDifficultyId(question.getDifficulty().getId());
+            response.setOptions(optionResponses);
+            response.setCategoryName(question.getCategory().getName());
+            response.setDificaltyName(question.getDifficulty().getName());
+            response.setCreatedBy(question.getCreatedBy());
+            response.setCreatedTime(question.getCreatedTime());
+            return response;
+        }).collect(Collectors.toList());
+    }
+
+
+    public List<QuestionResponse> findQuestionsByDifficultyId(Long difficultyId) {
+        List<Question> questionList = questionRepository.findByDifficultyId(difficultyId);
+
+        if (questionList.isEmpty()) {
+            return new ArrayList<>(); // Return empty list
+        }
+
+        return questionList.stream().map(question -> {
+            List<OptionResponse> optionResponses = question.getOptions().stream()
+                    .map(option -> new OptionResponse(option.getId(), option.getOptionText()))
+                    .collect(Collectors.toList());
+
+            Long correctAnswerId = question.getOptions().stream()
+                    .filter(option -> option.getOptionText().equals(question.getCorrectAnswer()))
+                    .findFirst()
+                    .map(Option::getId) // Use map to handle optional
+                    .orElse(null);
+
+            QuestionResponse response = new QuestionResponse();
+            response.setId(question.getId());
+            response.setQuestion(question.getQuestion());
+            response.setCorrectAnswerId(correctAnswerId);
+            response.setQuestionTypeId(question.getQuestionType().getId());
+            response.setQuestionTypeName(question.getQuestionType().getName());
+            response.setCategoryId(question.getCategory().getId());
+            response.setDifficultyId(question.getDifficulty().getId());
+            response.setOptions(optionResponses);
+            response.setCategoryName(question.getCategory().getName());
+            response.setDificaltyName(question.getDifficulty().getName());
+            response.setCreatedBy(question.getCreatedBy());
+            response.setCreatedTime(question.getCreatedTime());
+            return response;
+        }).collect(Collectors.toList());
+    }
+
+    public List<QuestionResponse> getQuestionByQuestionByType(Long questionTypeId) {
+
+
+        List<Question> questionList = questionRepository.findByQuestionTypeId(questionTypeId);
+
+        if (questionList.isEmpty()) {
+            return new ArrayList<>(); // Return empty list
+        }
+
+        return questionList.stream().map(question -> {
+            List<OptionResponse> optionResponses = question.getOptions().stream()
+                    .map(option -> new OptionResponse(option.getId(), option.getOptionText()))
+                    .collect(Collectors.toList());
+
+            Long correctAnswerId = question.getOptions().stream()
+                    .filter(option -> option.getOptionText().equals(question.getCorrectAnswer()))
+                    .findFirst()
+                    .map(Option::getId) // Use map to handle optional
+                    .orElse(null);
+
+            QuestionResponse response = new QuestionResponse();
+            response.setId(question.getId());
+            response.setQuestion(question.getQuestion());
+            response.setCorrectAnswerId(correctAnswerId);
+            response.setQuestionTypeId(question.getQuestionType().getId());
+            response.setQuestionTypeName(question.getQuestionType().getName());
+            response.setCategoryId(question.getCategory().getId());
+            response.setDifficultyId(question.getDifficulty().getId());
+            response.setOptions(optionResponses);
+            response.setCategoryName(question.getCategory().getName());
+            response.setDificaltyName(question.getDifficulty().getName());
+            response.setCreatedBy(question.getCreatedBy());
+            response.setCreatedTime(question.getCreatedTime());
+            return response;
+        }).collect(Collectors.toList());
     }
 }
