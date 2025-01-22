@@ -53,5 +53,24 @@ public class QuestionController {
         List<QuestionResponse> questionResponseList = questionService.getQuestionByQuestionByType(id);
         return ResponseEntity.ok(questionResponseList);
     }
-    // Additional endpoints for CRUD operations
+
+
+    @GetMapping("generateQuiz")
+    public ResponseEntity<List<Long>> getQuestionsForQuiz(@RequestParam Long categoryId,@RequestParam Long difficultyId, @RequestParam Integer numQuestions) {
+
+        return questionService.getQestionsForQuiz(categoryId,difficultyId, numQuestions);
+    }
+
+    @PostMapping("getQuizQuestion")
+
+    public ResponseEntity<List<QuestionResponse>> getQuizQuestionsFromId(@RequestBody List<Long> questionIds) {
+
+
+        return     ResponseEntity.ok(questionService.getQuizQuestionsFromId(questionIds));
+    }
+
+//    @PostMapping("getScore")
+//    public ResponseEntity<Integer> getScore(@RequestBody List<Response> responses) {
+//        return questionService.getScore(responses);
+//    }
 }

@@ -9,12 +9,15 @@ import com.redhun.question_service.repository.DifficultyRepository;
 import com.redhun.question_service.repository.QuestionRepository;
 import com.redhun.question_service.repository.QuestionTypeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -264,5 +267,44 @@ public class QuestionService {
             response.setCreatedTime(question.getCreatedTime());
             return response;
         }).collect(Collectors.toList());
+    }
+
+    public List<QuestionResponse> getQuizQuestionsFromId(List<Long> questionIds) {
+
+        List<Question> questionList = questionRepository.findAllById(questionIds);
+
+        return questionList.stream().map(question -> {
+            List<OptionResponse> optionResponses = question.getOptions().stream()
+                    .map(option -> new OptionResponse(option.getId(), option.getOptionText()))
+                    .collect(Collectors.toList());
+
+            Long correctAnswerId = question.getOptions().stream()
+                    .filter(option -> option.getOptionText().equals(question.getCorrectAnswer()))
+                    .findFirst()
+                    .map(Option::getId)
+                    .orElse(null);
+
+            QuestionResponse response = new QuestionResponse();
+            response.setId(question.getId());
+            response.setQuestion(question.getQuestion());
+            response.setCorrectAnswerId(correctAnswerId);
+            response.setQuestionTypeId(question.getQuestionType().getId());
+            response.setQuestionTypeName(question.getQuestionType().getName());
+            response.setCategoryId(question.getCategory().getId());
+            response.setDifficultyId(question.getDifficulty().getId());
+            response.setOptions(optionResponses);
+            response.setCategoryName(question.getCategory().getName());
+            response.setDificaltyName(question.getDifficulty().getName());
+            response.setCreatedBy(question.getCreatedBy());
+            response.setCreatedTime(question.getCreatedTime());
+            return response;
+        }).collect(Collectors.toList());
+    }
+
+    public ResponseEntity<List<Long>> getQestionsForQuiz(Long categoryId,Long difficultyId, Integer numQuestions) {
+        List<Long> qustions = questionRepository.findRandomQuestionsByCatogory(categoryId,difficultyId, numQuestions);
+
+
+        return new ResponseEntity<>(qustions, HttpStatus.OK);
     }
 }

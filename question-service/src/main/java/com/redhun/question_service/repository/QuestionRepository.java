@@ -23,4 +23,7 @@ public interface QuestionRepository extends JpaRepository<Question, Long> {
     List<Question> findByDifficultyId(Long difficultyId);
 
     List<Question> findByQuestionTypeId(Long questionTypeId);
+
+    @Query(value = "SELECT q.id FROM question q WHERE q.category_id = :categoryId AND q.difficulty_id = :difficultyId ORDER BY RANDOM() LIMIT :numQuestions", nativeQuery = true)
+    List<Long> findRandomQuestionsByCatogory(Long categoryId, Long difficultyId, Integer numQuestions);
 }
