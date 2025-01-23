@@ -14,14 +14,16 @@ import java.util.List;
 public interface QuizInterface {
 
 
-
     @GetMapping("api/questions/generateQuiz")
-    public ResponseEntity<List<Long>> getQuestionsForQuiz(@RequestParam Long categoryId,@RequestParam Long difficultyId,  @RequestParam Integer numQuestions);
+    public ResponseEntity<List<Long>> getQuestionsForQuiz(
+            @RequestParam(required = false) Long categoryId,
+            @RequestParam(required = false) Long difficultyId,
+            @RequestParam Integer numQuestions);
+    // Add your implementation logic here
 
 
-
-    @PostMapping("question/getQuestion")
-    public  ResponseEntity<List<QuestionResponseDto>> getQuestionsFromId(@RequestBody List<Integer> questionIds);
+    @PostMapping("api/questions/getQuizQuestion")
+    public ResponseEntity<List<QuestionResponseDto>> getQuestionsFromId(@RequestBody List<Long> questionIds);
 //
 //    @PostMapping("question/getScore")
 //    public ResponseEntity<Integer> getScore(@RequestBody List<Response> responses);

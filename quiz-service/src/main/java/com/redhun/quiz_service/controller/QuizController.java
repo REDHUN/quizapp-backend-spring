@@ -23,14 +23,14 @@ public class QuizController {
         return quizService.createQuiz(quizDto.getCategoryId(),quizDto.getDifficultyId(), quizDto.getNumberOfQuestions(), quizDto.getTitle(),quizDto.getDescription());
     }
 
-//    @GetMapping("get/{id}")
-//    public ResponseEntity<List<QuestionResponseDto>> getQuizQuestions(@PathVariable Integer id) {
-//        return quizService.getQuizQuestions(id);
-//    }
-//    @GetMapping("getAllQuiz")
-//    public ResponseEntity<List<Quiz>> getQuizQuestions() {
-//        return quizService.getAllQuiz();
-//    }
+    @GetMapping("getQuizQuestions/{id}")
+    public ResponseEntity<List<QuestionResponseDto>> getQuizQuestions(@PathVariable Long id) {
+        return quizService.getQuizQuestions(id);
+    }
+    @GetMapping("getAllQuiz")
+    public ResponseEntity<List<Quiz>> getQuizQuestions() {
+        return quizService.getAllQuiz();
+    }
 //
 //    @PostMapping("submit/{id}")
 //    public  ResponseEntity<Integer> submitQuiz(@PathVariable Integer id, @RequestBody List<Response> responses){

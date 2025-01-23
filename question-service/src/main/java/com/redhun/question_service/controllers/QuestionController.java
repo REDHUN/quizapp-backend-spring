@@ -1,4 +1,5 @@
 package com.redhun.question_service.controllers;
+
 import com.redhun.question_service.dto.QuestionRequest;
 import com.redhun.question_service.dto.QuestionResponse;
 import com.redhun.question_service.service.QuestionService;
@@ -33,40 +34,46 @@ public class QuestionController {
 
 
     @GetMapping("getAllQuestions")
-    public ResponseEntity<List<QuestionResponse> >getAllQuestions() {
+    public ResponseEntity<List<QuestionResponse>> getAllQuestions() {
         List<QuestionResponse> questionResponseList = questionService.getAllQuestion();
         return ResponseEntity.ok(questionResponseList);
     }
 
     @GetMapping("getQuestionByCategoryId/{id}")
-    public ResponseEntity<List<QuestionResponse> >getQuestionByCategoryId(@PathVariable Long id) {
+    public ResponseEntity<List<QuestionResponse>> getQuestionByCategoryId(@PathVariable Long id) {
         List<QuestionResponse> questionResponseList = questionService.findQuestionsByCategoryId(id);
         return ResponseEntity.ok(questionResponseList);
     }
+
     @GetMapping("getQuestionByDifficultyId/{id}")
-    public ResponseEntity<List<QuestionResponse> >etQuestionByDifficultyId(@PathVariable Long id) {
+    public ResponseEntity<List<QuestionResponse>> etQuestionByDifficultyId(@PathVariable Long id) {
         List<QuestionResponse> questionResponseList = questionService.findQuestionsByDifficultyId(id);
         return ResponseEntity.ok(questionResponseList);
     }
+
     @GetMapping("getQuestionByQuestionType/{id}")
-    public ResponseEntity<List<QuestionResponse>>getQuestionByQuestionByType(@PathVariable Long id) {
+    public ResponseEntity<List<QuestionResponse>> getQuestionByQuestionByType(@PathVariable Long id) {
         List<QuestionResponse> questionResponseList = questionService.getQuestionByQuestionByType(id);
         return ResponseEntity.ok(questionResponseList);
     }
 
 
     @GetMapping("generateQuiz")
-    public ResponseEntity<List<Long>> getQuestionsForQuiz(@RequestParam Long categoryId,@RequestParam Long difficultyId, @RequestParam Integer numQuestions) {
+    public ResponseEntity<List<Long>> getQuestionsForQuiz(
+            @RequestParam(required = false) Long categoryId,
+            @RequestParam(required = false) Long difficultyId,
+            @RequestParam Integer numQuestions) {
 
-        return questionService.getQestionsForQuiz(categoryId,difficultyId, numQuestions);
+        return questionService.getQestionsForQuiz(categoryId, difficultyId, numQuestions);
     }
+
 
     @PostMapping("getQuizQuestion")
 
     public ResponseEntity<List<QuestionResponse>> getQuizQuestionsFromId(@RequestBody List<Long> questionIds) {
 
 
-        return     ResponseEntity.ok(questionService.getQuizQuestionsFromId(questionIds));
+        return ResponseEntity.ok(questionService.getQuizQuestionsFromId(questionIds));
     }
 
 //    @PostMapping("getScore")

@@ -301,10 +301,20 @@ public class QuestionService {
         }).collect(Collectors.toList());
     }
 
-    public ResponseEntity<List<Long>> getQestionsForQuiz(Long categoryId,Long difficultyId, Integer numQuestions) {
-        List<Long> qustions = questionRepository.findRandomQuestionsByCatogory(categoryId,difficultyId, numQuestions);
+    public ResponseEntity<List<Long>> getQestionsForQuiz(Long categoryId, Long difficultyId, Integer numQuestions) {
+        List<Long> questions;
 
+        if (categoryId == null && difficultyId == null) {
+            questions = questionRepository.findRandomQuestionIds(numQuestions);
+        } else if (categoryId == null) {
+            questions = questionRepository.findRandomQuestionsByDifficulty(difficultyId, numQuestions);
+        } else if (difficultyId == null) {
+            questions = questionRepository.findRandomQuestionsByCategory(categoryId, numQuestions);
+        } else {
+            questions = questionRepository.findRandomQuestionsByCategoryAndDifficulty(categoryId, difficultyId, numQuestions);
+        }
 
-        return new ResponseEntity<>(qustions, HttpStatus.OK);
+        return new ResponseEntity<>(questions, HttpStatus.OK);
     }
+
 }
