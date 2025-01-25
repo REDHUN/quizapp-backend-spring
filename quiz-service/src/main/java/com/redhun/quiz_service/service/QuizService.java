@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class QuizService {
@@ -59,6 +60,18 @@ public class QuizService {
 
     }
 
+    public ResponseEntity<Quiz> getQuiz(Long quizId) {
+
+        Optional<Quiz> quizOptional = quizRepo.findById(quizId);
+
+        if(quizOptional.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        } else {
+            Quiz quiz = quizOptional.get();
+            return new ResponseEntity<>(quiz, HttpStatus.OK);
+        }
+    }
+
     public ResponseEntity<List<QuestionResponseDto>> getQuizQuestions(Long id) {
 
         Quiz quiz=quizRepo.findById(id).orElse(null);
@@ -72,4 +85,5 @@ public class QuizService {
         }
 
     }
+
 }
