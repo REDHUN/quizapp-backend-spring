@@ -15,12 +15,14 @@ import java.util.stream.Collectors;
 
 @Service
 public class ResultService {
-@Autowired
-  QuizInterface quizInterface;
-@Autowired
-   ResultRepository resultRepository;
-@Autowired
-QuizService quizService;
+    @Autowired
+    QuizInterface quizInterface;
+
+    @Autowired
+    ResultRepository resultRepository;
+
+    @Autowired
+    QuizService quizService;
 
     @Autowired
     public ResultService(QuizInterface quizInterface, ResultRepository resultRepository) {
@@ -41,11 +43,14 @@ QuizService quizService;
         // Step 4: Calculate the user's score
         int score = calculateScore(userResponses, correctAnswerMap);
 
-        // Step 5: Save the result in the database
+        // Step 5: Fetch quiz details
+        Quiz quiz = fetchQuizDetails(userResponses.getQuizId());
+
+        // Step 6: Save the result in the database
         saveResult(userResponses, questionIds, score);
 
-        // Step 6: Return the response DTO with the calculated score
-        return new ResultResponseDto(userResponses.getUserId(), userResponses.getQuizId(), score);
+        // Step 7: Return the response DTO with the calculated score, total number of questions, and quiz name
+        return new ResultResponseDto(userResponses.getUserId(), userResponses.getQuizId(), quiz.getTitle(), score, questionIds.size());
     }
 
     private List<Long> extractQuestionIds(UserResponseDto userResponses) {
@@ -61,6 +66,14 @@ QuizService quizService;
             throw new RuntimeException("Failed to fetch questions from the Question Service.");
         }
         return questions;
+    }
+
+    private Quiz fetchQuizDetails(Long quizId) {
+        Quiz quiz = quizService.getQuiz(quizId).getBody();
+        if (quiz == null) {
+            throw new RuntimeException("Failed to fetch quiz details from the Quiz Service.");
+        }
+        return quiz;
     }
 
     private Map<Long, Long> createCorrectAnswerMap(List<QuestionResponseDto> questions) {
@@ -107,7 +120,7 @@ QuizService quizService;
     }
 
     private QuizResultReport mapToQuizResultReport(Result result) {
-        // Assuming quizName can be fetched from QuizInterface using the quizId
+        // Fetch quiz details
         Quiz quiz = quizService.getQuiz(result.getQuizId()).getBody();
         String quizName = (quiz != null) ? quiz.getTitle() : "N/A";
 
@@ -119,7 +132,7 @@ QuizService quizService;
         List<QuizResultReport.QuestionResult> questionResults = result.getQuestionIds().stream()
                 .map(questionId -> {
                     QuestionResponseDto question = questionMap.get(questionId);
-                    String userAnswer = getUserAnswer(result.getUserAnswers(), result.getQuestionIds(), question.getOptions(),questionId);
+                    String userAnswer = getUserAnswer(result.getUserAnswers(), result.getQuestionIds(), question.getOptions(), questionId);
                     String correctAnswer = getCorrectAnswer(question);
 
                     int scoredMark = correctAnswer.equals(userAnswer) ? 1 : 0;
@@ -134,6 +147,8 @@ QuizService quizService;
 
         return new QuizResultReport(
                 result.getUserId(),
+                result.getQuizId(), // Added quizId
+                result.getId(), // Added resultId
                 quizName,
                 result.getScore(),
                 questionResults
@@ -152,10 +167,6 @@ QuizService quizService;
         return "N/A";
     }
 
-
-
-
-
     private String getUserAnswer(List<Long> userAnswers, List<Long> questionIds, List<OptionResponseDto> options, Long questionId) {
         // Retrieve user's answer for a specific questionId
         // Assuming userAnswers list contains the user's answers in order of the question IDs
@@ -170,6 +181,4 @@ QuizService quizService;
         }
         return "N/A";
     }
-
-
 }

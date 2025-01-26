@@ -5,12 +5,16 @@ import java.util.List;
 public class QuizResultReport {
 
     private Long userId;
+    private Long quizId;
+    private Long resultId; // Add this line
     private String quizName;
     private int score;
     private List<QuestionResult> questionResults;
 
-    public QuizResultReport(Long userId, String quizName, int score, List<QuestionResult> questionResults) {
+    public QuizResultReport(Long userId, Long quizId, Long resultId, String quizName, int score, List<QuestionResult> questionResults) {
         this.userId = userId;
+        this.quizId = quizId;
+        this.resultId = resultId; // Add this line
         this.quizName = quizName;
         this.score = score;
         this.questionResults = questionResults;
@@ -24,6 +28,22 @@ public class QuizResultReport {
 
     public void setUserId(Long userId) {
         this.userId = userId;
+    }
+
+    public Long getQuizId() {
+        return quizId;
+    }
+
+    public void setQuizId(Long quizId) {
+        this.quizId = quizId;
+    }
+
+    public Long getResultId() { // Add this getter
+        return resultId;
+    }
+
+    public void setResultId(Long resultId) { // Add this setter
+        this.resultId = resultId;
     }
 
     public String getQuizName() {

@@ -24,7 +24,7 @@ public class ResultController {
         ResultResponseDto result = resultService.calculateResult(userResponses);
         return ResponseEntity.ok(result);
     }
-    @GetMapping("report")
+    @GetMapping("/report")
     public ResponseEntity<List<QuizResultReport>> getResult(
             @RequestParam(required = false) Long userId) {
 
