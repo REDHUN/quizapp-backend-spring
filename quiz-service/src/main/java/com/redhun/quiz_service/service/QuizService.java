@@ -21,7 +21,7 @@ public class QuizService {
     @Autowired
     QuizInterface quizInterface;
 
-    public ResponseEntity<String> createQuiz(Long categoryId, Long difficultyId, int numQ, String title, String description) {
+    public ResponseEntity<Long> createQuiz(Long categoryId, Long difficultyId, int numQ, String title, String description) {
         List<Long> questions;
 
         // Fetch questions based on the provided criteria
@@ -41,10 +41,11 @@ public class QuizService {
         quiz.setDescription(description);
         quiz.setQuestionIds(questions);
         quiz.setTotalQuestions(numQ);
-        quizRepo.save(quiz);
+        Quiz savedQuiz = quizRepo.save(quiz);
 
-        return new ResponseEntity<>("Success", HttpStatus.OK);
+        return new ResponseEntity<>(savedQuiz.getId(), HttpStatus.OK);
     }
+
 
     public ResponseEntity<List<Quiz>> getAllQuiz() {
 

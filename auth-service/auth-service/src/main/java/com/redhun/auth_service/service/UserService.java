@@ -76,4 +76,16 @@ System.out.println("user id is "+userId);
         return repo.findById(Math.toIntExact(userId))
                 .orElseThrow(() -> new UsernameNotFoundException("User with ID "));
     }
+
+
+    public ResponseEntity<User> getUserDetailsByToken(String token) {
+        // Extract the username from the token
+        String username = jwtService.extractUserName(token);
+
+        // Load the user by username
+        User user = loadUserByUsername(username);
+
+        // Return the user details as a ResponseEntity
+        return ResponseEntity.ok(user);
+    }
 }
