@@ -2,6 +2,9 @@ package com.redhun.question_service.controllers;
 
 import com.redhun.question_service.dto.QuestionRequest;
 import com.redhun.question_service.dto.QuestionResponse;
+import com.redhun.question_service.models.Category;
+import com.redhun.question_service.models.Difficulty;
+import com.redhun.question_service.models.QuestionType;
 import com.redhun.question_service.service.QuestionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -76,8 +79,28 @@ public class QuestionController {
         return ResponseEntity.ok(questionService.getQuizQuestionsFromId(questionIds));
     }
 
-//    @PostMapping("getScore")
-//    public ResponseEntity<Integer> getScore(@RequestBody List<Response> responses) {
-//        return questionService.getScore(responses);
-//    }
+    @GetMapping("getQuestionCategory")
+
+    public ResponseEntity<List<Category>> getQuestionCategory() {
+
+
+        return ResponseEntity.ok(questionService.getQuestionCategory());
+    }
+
+    @GetMapping("getQuestionDifficulty")
+
+    public ResponseEntity<List<Difficulty>> getQuestionDifficultyList() {
+
+
+        return ResponseEntity.ok(questionService.getQuestionDifficulty());
+    }
+
+    @GetMapping("getQuestionType")
+
+    public ResponseEntity<List<QuestionType>> getQuestionType() {
+
+
+        return ResponseEntity.ok(questionService.getQuestionType());
+    }
+
 }

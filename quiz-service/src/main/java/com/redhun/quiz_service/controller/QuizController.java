@@ -31,10 +31,5 @@ public class QuizController {
     public ResponseEntity<List<Quiz>> getQuizQuestions() {
         return quizService.getAllQuiz();
     }
-//
-//    @PostMapping("submit/{id}")
-//    public  ResponseEntity<Integer> submitQuiz(@PathVariable Integer id, @RequestBody List<Response> responses){
-//
-//        return  quizService.calculateResult(id,responses);
-//    }
+
 }

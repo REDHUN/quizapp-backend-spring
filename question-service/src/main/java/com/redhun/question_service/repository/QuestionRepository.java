@@ -38,5 +38,7 @@ public interface QuestionRepository extends JpaRepository<Question, Long> {
 
     @Query(value = "SELECT q.id FROM Question q ORDER BY RANDOM() LIMIT :numQuestions", nativeQuery = true)
     List<Long> findRandomQuestionIds(Integer numQuestions);
+
+
 }
 

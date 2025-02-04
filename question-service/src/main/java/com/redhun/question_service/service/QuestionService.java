@@ -49,7 +49,7 @@ public class QuestionService {
         question.setQuestionType(questionType);
         question.setCategory(category);
         question.setDifficulty(difficulty);
-        question.setCreatedBy("defaultUser");  // Replace with actual user
+        question.setCreatedBy(questionRequest.getCreatedBy());  // Replace with actual user
         question.setCreatedTime(LocalDateTime.now());
 
         List<Option> options = questionRequest.getOptions().stream()
@@ -317,4 +317,16 @@ public class QuestionService {
         return new ResponseEntity<>(questions, HttpStatus.OK);
     }
 
+    public List<Category> getQuestionCategory() {
+        return categoryRepository.findAll();
+    }
+
+    public List<Difficulty> getQuestionDifficulty() {
+
+        return  difficultyRepository.findAll();
+    }
+
+    public List<QuestionType> getQuestionType() {
+        return  questionTypeRepository.findAll();
+    }
 }
