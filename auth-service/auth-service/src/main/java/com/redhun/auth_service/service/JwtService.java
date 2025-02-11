@@ -3,6 +3,7 @@ package com.redhun.auth_service.service;
 
 import com.redhun.auth_service.model.User;
 import io.jsonwebtoken.Claims;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -13,11 +14,9 @@ import io.jsonwebtoken.security.Keys;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import java.security.NoSuchAlgorithmException;
-import java.util.Base64;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 public class JwtService {
@@ -54,17 +53,19 @@ public class JwtService {
 
 
     public String extractUserName(String token) {
-        System.out.println("The token is" + token);
-        // extract the username from jwt token
-        return extractClaim(token.trim(), Claims::getSubject);
+        System.out.println(extractClaim(token, Claims::getSubject));
+        return extractClaim(token, Claims::getSubject);
     }
 
-    private <T> T extractClaim(String token, Function<Claims, T> claimResolver) {
+    public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
         final Claims claims = extractAllClaims(token);
-        return claimResolver.apply(claims);
-    }
 
+        return claimsResolver.apply(claims);
+
+    }
     public Claims extractAllClaims(String token) {
+
+
         return Jwts.parser()                 // Create JwtParserBuilder
                 .verifyWith(getKey())            // Set the signing key
                 .build()                            // Build the parser
@@ -87,5 +88,13 @@ public class JwtService {
 
     private Date extractExpiration(String token) {
         return extractClaim(token, Claims::getExpiration);
+    }
+    // Method to extract roles
+    public List<SimpleGrantedAuthority> extractRoles(String token) {
+        Claims claims = extractAllClaims(token);
+        List<?> roles = (List<?>) claims.get("authorities");
+        return roles.stream()
+                .map(role -> new SimpleGrantedAuthority((String) role))
+                .collect(Collectors.toList());
     }
 }

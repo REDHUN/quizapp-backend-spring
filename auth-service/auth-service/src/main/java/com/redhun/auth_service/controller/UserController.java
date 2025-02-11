@@ -64,7 +64,7 @@ System.out.println(user);
 
 
 
-    @GetMapping("api/auth/getUserDetails")
+    @GetMapping("api/user/getUserDetails")
     public ResponseEntity<User> getUserDetails(@RequestHeader("Authorization") String token) {
         // Remove "Bearer " prefix from token if it exists
         if (token.startsWith("Bearer ")) {

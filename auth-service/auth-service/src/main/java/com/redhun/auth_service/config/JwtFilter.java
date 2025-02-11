@@ -10,6 +10,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -36,6 +37,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
 
         String authHeader = request.getHeader("Authorization");
+        System.out.println("Auth Header is "+ authHeader);
         String token = null;
         String userName = null;
 
@@ -43,6 +45,10 @@ public class JwtFilter extends OncePerRequestFilter {
             token = authHeader.substring(7);
             userName = jwtService.extractUserName(token);
         }
+
+        System.out.println("Token: " + token);
+        System.out.println("Username: " + userName);
+        System.out.println("Request URI: " + request.getRequestURI());
 
         if (userName != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
@@ -61,6 +67,12 @@ public class JwtFilter extends OncePerRequestFilter {
 
 
     }
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null) {
+//            System.out.println("Authenticated user: " + auth.getName());
+//            System.out.println("Roles: " + auth.getAuthorities());
+        }
         filterChain.doFilter(request,response);
 
 

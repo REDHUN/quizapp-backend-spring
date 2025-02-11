@@ -1,31 +1,58 @@
 package com.redhun.auth_service.model;
 
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
-
+import java.util.List;
 
 public class TokenValidationResponse {
     private boolean valid;
     private String username;
+    private List<String> role;
 
-    // Private constructor to prevent direct instantiation
-    private TokenValidationResponse(Builder builder) {
-        this.valid = builder.valid;
-        this.username = builder.username;
+    // Default constructor
+    public TokenValidationResponse() {
     }
 
-    // Getters
+    // Parameterized constructor
+    public TokenValidationResponse(boolean valid, String username, List<String> role) {
+        this.valid = valid;
+        this.username = username;
+        this.role = role;
+    }
+
+    // Getter and Setter methods
     public boolean isValid() {
         return valid;
+    }
+
+    public void setValid(boolean valid) {
+        this.valid = valid;
     }
 
     public String getUsername() {
         return username;
     }
 
-    // Static nested Builder class
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public List<String> getRole() {
+        return role;
+    }
+
+    public void setRole(List<String> role) {
+        this.role = role;
+    }
+
+    // Builder pattern for easy object creation
     public static class Builder {
         private boolean valid;
         private String username;
+        private List<String> role;
+
+        public Builder() {
+        }
 
         public Builder valid(boolean valid) {
             this.valid = valid;
@@ -37,8 +64,13 @@ public class TokenValidationResponse {
             return this;
         }
 
+        public Builder role(List<String> role) {
+            this.role = role;
+            return this;
+        }
+
         public TokenValidationResponse build() {
-            return new TokenValidationResponse(this);
+            return new TokenValidationResponse(valid, username, role);
         }
     }
 }

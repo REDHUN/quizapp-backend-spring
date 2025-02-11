@@ -3,6 +3,9 @@ package com.redhun.question_service.service;
 import com.redhun.question_service.dto.OptionResponse;
 import com.redhun.question_service.dto.QuestionRequest;
 import com.redhun.question_service.dto.QuestionResponse;
+import com.redhun.question_service.dto.edit_question_dto.EditOptionDto;
+import com.redhun.question_service.dto.edit_question_dto.EditQuestionDto;
+import com.redhun.question_service.exception.ResourceNotFoundException;
 import com.redhun.question_service.models.*;
 import com.redhun.question_service.repository.CategoryRepository;
 import com.redhun.question_service.repository.DifficultyRepository;
@@ -17,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -328,5 +332,77 @@ public class QuestionService {
 
     public List<QuestionType> getQuestionType() {
         return  questionTypeRepository.findAll();
+    }
+    @Transactional
+    public QuestionResponse editQuestion(Long questionId, EditQuestionDto questionRequest) {
+        Category category = categoryRepository.findById(questionRequest.getCategoryId())
+                .orElseThrow(() -> new RuntimeException("Category not found"));
+        Difficulty difficulty = difficultyRepository.findById(questionRequest.getDifficultyId())
+                .orElseThrow(() -> new RuntimeException("Difficulty not found"));
+        QuestionType questionType = questionTypeRepository.findById(questionRequest.getQuestionTypeId())
+                .orElseThrow(() -> new RuntimeException("Question Type not found"));
+
+        Question question = questionRepository.findById(questionId)
+                .orElseThrow(() -> new ResourceNotFoundException("Question not found"));
+
+        question.setQuestion(questionRequest.getQuestion());
+        question.setCorrectAnswer(
+                question.getOptions().stream()
+                        .filter(option -> option.getId().equals(questionRequest.getCorrectAnswerId()))
+                        .findFirst()
+                        .map(Option::getOptionText)
+                        .orElseThrow(() -> new RuntimeException("Correct answer not found in options"))
+        );
+        question.setQuestionType(questionType);
+        question.setCategory(category);
+        question.setDifficulty(difficulty);
+        question.setCreatedBy(questionRequest.getCreatedBy());
+        question.setCreatedTime(LocalDateTime.now());
+
+        updateOptions(question, questionRequest.getOptions());
+
+        Question updatedQuestion = questionRepository.save(question);
+
+        List<OptionResponse> optionResponses = updatedQuestion.getOptions().stream()
+                .map(option -> new OptionResponse(option.getId(), option.getOptionText()))
+                .collect(Collectors.toList());
+
+        QuestionResponse response = new QuestionResponse();
+        response.setId(updatedQuestion.getId());
+        response.setQuestion(updatedQuestion.getQuestion());
+        response.setCorrectAnswerId(questionRequest.getCorrectAnswerId());
+        response.setQuestionTypeId(updatedQuestion.getQuestionType().getId());
+        response.setQuestionTypeName(updatedQuestion.getQuestionType().getName());
+        response.setCategoryName(updatedQuestion.getCategory().getName());
+        response.setDificaltyName(updatedQuestion.getDifficulty().getName());
+        response.setOptions(optionResponses);
+        response.setCreatedBy(updatedQuestion.getCreatedBy());
+        response.setCreatedTime(updatedQuestion.getCreatedTime());
+
+        return response;
+    }
+
+    private void updateOptions(Question question, List<EditOptionDto> optionRequests) {
+        List<Option> currentOptions = question.getOptions();
+        Map<Long, Option> existingOptionsMap = currentOptions.stream()
+                .collect(Collectors.toMap(Option::getId, option -> option));
+
+        // Clear existing options without losing references
+        currentOptions.clear();
+
+        for (EditOptionDto optionRequest : optionRequests) {
+            Option option;
+            if (optionRequest.getId() != null && existingOptionsMap.containsKey(optionRequest.getId())) {
+                // Update existing option
+                option = existingOptionsMap.get(optionRequest.getId());
+                option.setOptionText(optionRequest.getText());
+            } else {
+                // Add new option
+                option = new Option();
+                option.setOptionText(optionRequest.getText());
+                option.setQuestion(question);
+            }
+            currentOptions.add(option);
+        }
     }
 }
