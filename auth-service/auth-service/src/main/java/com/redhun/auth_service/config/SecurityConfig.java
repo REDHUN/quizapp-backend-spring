@@ -49,7 +49,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/admin/**").hasRole("ADMIN") // Ensure this covers all admin paths
 
                         // Authenticated endpoints (non-admin)
-                        .requestMatchers("/api/questions/**", "/api/user/**").authenticated()
+                        .requestMatchers("/api/questions/**", "/api/user/**","/api/quiz/**").authenticated()
 
                         // Deny all other requests
                         .anyRequest().denyAll())

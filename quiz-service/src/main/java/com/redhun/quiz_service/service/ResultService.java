@@ -132,8 +132,8 @@ public class ResultService {
         List<QuizResultReport.QuestionResult> questionResults = result.getQuestionIds().stream()
                 .map(questionId -> {
                     QuestionResponseDto question = questionMap.get(questionId);
-                    String userAnswer = getUserAnswer(result.getUserAnswers(), result.getQuestionIds(), question.getOptions(), questionId);
-                    String correctAnswer = getCorrectAnswer(question);
+                    String userAnswer = (question != null) ? getUserAnswer(result.getUserAnswers(), result.getQuestionIds(), question.getOptions(), questionId) : "N/A";
+                    String correctAnswer = (question != null) ? getCorrectAnswer(question) : "N/A";
 
                     int scoredMark = correctAnswer.equals(userAnswer) ? 1 : 0;
                     return new QuizResultReport.QuestionResult(
@@ -147,13 +147,14 @@ public class ResultService {
 
         return new QuizResultReport(
                 result.getUserId(),
-                result.getQuizId(), // Added quizId
-                result.getId(), // Added resultId
+                result.getQuizId(),
+                result.getId(),
                 quizName,
                 result.getScore(),
                 questionResults
         );
     }
+
 
     private String getCorrectAnswer(QuestionResponseDto question) {
         // Assuming the correct answer can be identified by some property in the options
