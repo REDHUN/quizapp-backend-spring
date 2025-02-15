@@ -103,4 +103,12 @@ public class QuestionController {
         return ResponseEntity.ok(questionService.getQuestionType());
     }
 
+    @GetMapping("filterQuestion")
+    public List<QuestionResponse> getQuestionsByFilters(
+            @RequestParam(required = false) Long categoryId,
+            @RequestParam(required = false) Long questionTypeId,
+            @RequestParam(required = false) Long difficultyId) {
+
+        return questionService.getQuestionsByFilters(categoryId, questionTypeId, difficultyId);
+    }
 }

@@ -33,6 +33,9 @@ public class Question {
     @OneToMany(mappedBy = "question", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Option> options;
 
+    // Add the isDeleted field
+    private String isDeleted = "N"; // Default value is "N"
+
     // Constructors, getters, and setters
     public Question() {}
 
@@ -45,6 +48,7 @@ public class Question {
         this.category = category;
         this.options = options;
         this.questionType = questionType;
+        this.isDeleted = "N";
     }
 
     // Getters and setters
@@ -118,5 +122,13 @@ public class Question {
 
     public void setQuestionType(QuestionType questionType) {
         this.questionType = questionType;
+    }
+
+    public String getIsDeleted() {
+        return isDeleted;
+    }
+
+    public void setIsDeleted(String isDeleted) {
+        this.isDeleted = isDeleted;
     }
 }

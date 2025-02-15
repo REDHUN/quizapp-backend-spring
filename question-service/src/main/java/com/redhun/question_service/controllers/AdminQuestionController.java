@@ -19,4 +19,13 @@ public class AdminQuestionController {
         QuestionResponse updatedQuestion = questionService.editQuestion(id, questionRequest);
         return new ResponseEntity<>(updatedQuestion, HttpStatus.OK);
     }
+    @DeleteMapping("/deleteQuestion/{id}")
+    public ResponseEntity<Long> deleteQuestion(@PathVariable Long id) {
+        Long deletedQuestionId = questionService.deleteQuestion(id);
+        if (deletedQuestionId != null) {
+            return ResponseEntity.ok(deletedQuestionId); // Return the deleted question ID
+        } else {
+            return ResponseEntity.notFound().build(); // Return 404 if question is not found
+        }
+    }
 }

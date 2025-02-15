@@ -121,7 +121,9 @@ public class QuestionService {
         response.setCategoryName(question.getCategory().getName());
         response.setDificaltyName(question.getDifficulty().getName());
         response.setCreatedBy(question.getCreatedBy());
+        response.setIsDeleted(question.getIsDeleted()); // Set the isDeleted value
         response.setCreatedTime(question.getCreatedTime());
+
 
         return response; // Return the built response
     }
@@ -143,7 +145,7 @@ public class QuestionService {
             Long correctAnswerId = question.getOptions().stream()
                     .filter(option -> option.getOptionText().equals(question.getCorrectAnswer()))
                     .findFirst()
-                    .map(Option::getId) // Use map to handle optional
+                    .map(Option::getId)
                     .orElse(null);
 
             QuestionResponse response = new QuestionResponse();
@@ -159,10 +161,12 @@ public class QuestionService {
             response.setDificaltyName(question.getDifficulty().getName());
             response.setCreatedBy(question.getCreatedBy());
             response.setCreatedTime(question.getCreatedTime());
+            response.setIsDeleted(question.getIsDeleted()); // Set the isDeleted value
             questionResponseList.add(response);
         }
         return questionResponseList;
     }
+
 
 
     public List<QuestionResponse> findQuestionsByCategoryId(Long categoryId) {
@@ -404,5 +408,67 @@ public class QuestionService {
             }
             currentOptions.add(option);
         }
+    }
+    @Transactional
+    public Long deleteQuestion(Long id) {
+        Question question = questionRepository.findById(id).orElse(null);
+        if (question != null) {
+            question.setIsDeleted("Y");
+            questionRepository.save(question);
+            return question.getId(); // Return the deleted question ID
+        }
+        return null; // Return null if question is not found
+    }
+
+
+
+    public List<QuestionResponse> getQuestionsByFilters(Long categoryId, Long questionTypeId, Long difficultyId) {
+        List<Question> questionList;
+
+        // Handle different combinations of filters
+        if (categoryId == null && questionTypeId == null && difficultyId == null) {
+            // No filters applied
+            questionList = questionRepository.findAll();
+        } else if (categoryId != null && questionTypeId != null && difficultyId != null) {
+            // All filters applied
+            questionList = questionRepository.findByCategoryIdAndQuestionTypeIdAndDifficultyId(
+                    categoryId, questionTypeId, difficultyId);
+        } else {
+            // Build dynamic query based on provided filters
+            questionList = questionRepository.findByFilters(categoryId, questionTypeId, difficultyId);
+        }
+
+        if (questionList.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        // Map questions to response DTOs
+        return questionList.stream().map(question -> {
+            List<OptionResponse> optionResponses = question.getOptions().stream()
+                    .map(option -> new OptionResponse(option.getId(), option.getOptionText()))
+                    .collect(Collectors.toList());
+
+            Long correctAnswerId = question.getOptions().stream()
+                    .filter(option -> option.getOptionText().equals(question.getCorrectAnswer()))
+                    .findFirst()
+                    .map(Option::getId)
+                    .orElse(null);
+
+            QuestionResponse response = new QuestionResponse();
+            response.setId(question.getId());
+            response.setQuestion(question.getQuestion());
+            response.setCorrectAnswerId(correctAnswerId);
+            response.setQuestionTypeId(question.getQuestionType().getId());
+            response.setQuestionTypeName(question.getQuestionType().getName());
+            response.setCategoryId(question.getCategory().getId());
+            response.setDifficultyId(question.getDifficulty().getId());
+            response.setOptions(optionResponses);
+            response.setCategoryName(question.getCategory().getName());
+            response.setDificaltyName(question.getDifficulty().getName());
+            response.setCreatedBy(question.getCreatedBy());
+            response.setCreatedTime(question.getCreatedTime());
+            response.setIsDeleted(question.getIsDeleted());
+            return response;
+        }).collect(Collectors.toList());
     }
 }
