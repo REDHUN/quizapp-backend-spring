@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/questions")
@@ -79,6 +80,7 @@ public class QuestionController {
         return ResponseEntity.ok(questionService.getQuizQuestionsFromId(questionIds));
     }
 
+    //Get Category
     @GetMapping("getQuestionCategory")
 
     public ResponseEntity<List<Category>> getQuestionCategory() {
@@ -86,6 +88,18 @@ public class QuestionController {
 
         return ResponseEntity.ok(questionService.getQuestionCategory());
     }
+
+    //Delete Category
+    @DeleteMapping("deleteCategory/{id}")
+    public boolean deleteCategory(@PathVariable Long id) {
+        return questionService.deleteCategory(id);
+    }
+//Check Category Is Used
+    @GetMapping("/isCategoryUsed/{id}")
+    public boolean isCategoryUsed(@PathVariable Long id) {
+        return questionService.isCategoryUsed(id);
+    }
+
 
     @GetMapping("getQuestionDifficulty")
 

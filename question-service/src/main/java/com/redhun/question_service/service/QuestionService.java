@@ -326,9 +326,55 @@ public class QuestionService {
     }
 
     public List<Category> getQuestionCategory() {
-        return categoryRepository.findAll();
+        return categoryRepository.findByIsDeleted("N");
     }
 
+    public boolean deleteCategory(Long id) {
+        if (isCategoryUsed(id)) {
+            return false; // Category is used, can't delete
+        }
+
+        Optional<Category> categoryOptional = categoryRepository.findById(id);
+        if (categoryOptional.isPresent()) {
+            Category category = categoryOptional.get();
+            category.setIsDeleted("Y");
+            categoryRepository.save(category);
+            return true;
+        } else {
+            return false;
+        }
+    }
+//for checking category is used.
+    public boolean isCategoryUsed(Long categoryId) {
+        Optional<Category> categoryOptional = categoryRepository.findById(categoryId);
+        if (categoryOptional.isPresent()) {
+            Category category = categoryOptional.get();
+            List<QuestionResponse> questions = findQuestionsByCategoryId(categoryId);
+            return !questions.isEmpty();
+        }
+        return false;
+    }
+//Save Category
+public Category saveCategory(String categoryName, String isActive, Long categoryId) {
+    if (categoryId == null) {
+        // Add a new category
+        Category category = new Category(categoryName);
+        category.setIsDeleted("N");
+        category.setIsActive(isActive);
+        return categoryRepository.save(category);
+    } else {
+        // Update an existing category
+        Optional<Category> existingCategoryOptional = categoryRepository.findById(categoryId);
+        if (existingCategoryOptional.isPresent()) {
+            Category existingCategory = existingCategoryOptional.get();
+            existingCategory.setName(categoryName);
+            existingCategory.setIsActive(isActive);
+            return categoryRepository.save(existingCategory);
+        } else {
+            return null;
+        }
+    }
+}
     public List<Difficulty> getQuestionDifficulty() {
 
         return  difficultyRepository.findAll();

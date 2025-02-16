@@ -2,11 +2,14 @@ package com.redhun.question_service.controllers;
 
 import com.redhun.question_service.dto.QuestionResponse;
 import com.redhun.question_service.dto.edit_question_dto.EditQuestionDto;
+import com.redhun.question_service.models.Category;
 import com.redhun.question_service.service.QuestionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/admin/questions")
@@ -27,5 +30,24 @@ public class AdminQuestionController {
         } else {
             return ResponseEntity.notFound().build(); // Return 404 if question is not found
         }
+    }
+    @PostMapping("/saveCategory")
+    public Category saveCategory(@RequestBody Map<String, Object> requestBody) {
+        String categoryName = (String) requestBody.get("category");
+        String isActive = (String) requestBody.get("isActive");
+        Long categoryId = null;
+        if (requestBody.get("categoryId") != null) {
+            try {
+                if (requestBody.get("categoryId") instanceof Number) {
+                    categoryId = ((Number) requestBody.get("categoryId")).longValue();
+                } else {
+                    categoryId = Long.parseLong((String) requestBody.get("categoryId"));
+                }
+            } catch (NumberFormatException e) {
+                // Handle the exception if categoryId is not a valid number
+                throw new IllegalArgumentException("Invalid categoryId format");
+            }
+        }
+        return questionService.saveCategory(categoryName, isActive, categoryId);
     }
 }
