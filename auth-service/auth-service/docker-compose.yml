@@ -1,0 +1,19 @@
+
+services:
+  app:
+    build: .
+    ports:
+      - "8081:8081"
+    networks:
+      - s-network
+    environment:
+      POSTGRES_HOST: host.docker.internal  # Use this for local PostgreSQL on Mac/Windows
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: a.b.c.def
+      POSTGRES_DB: quizapp-db
+    depends_on: []
+
+networks:
+  s-network:
+    driver: bridge
